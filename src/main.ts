@@ -4,6 +4,7 @@ import { initialBookings } from './data/initial-bookings'
 import { TYPESCRIPT_CAPACITY, BUILD_CAPACITY } from './data/capacities'
 import { countSeats } from './lib/count-seats'
 // HW-Б1: подключите расчёты из ./lib/availability.
+import { getRemainingSeats } from './lib/availability'
 // HW-Б2: импортируйте ./assets/workshops.svg как URL.
 
 const bookings: Array<Booking> = [...initialBookings]
@@ -133,6 +134,8 @@ function render(items: Booking[]) {
   })
   ui.total.textContent = String(countSeats(items))
   // HW-А4: обновите ui.typescriptFree и ui.buildFree через общий расчёт.
+  ui.typescriptFree.textContent = String(getRemainingSeats(items, 'typescript'))
+  ui.buildFree.textContent = String(getRemainingSeats(items, 'build'))
 }
 
 ui.form.addEventListener('submit', (event) => {
@@ -158,6 +161,11 @@ ui.form.addEventListener('submit', (event) => {
   }
 
   // HW-А3: сравните число участников с остатком мест выбранного занятия до изменения bookings.
+  const remainingSeats = getRemainingSeats(bookings, workshop.value)
+  if (seats.value > remainingSeats) {
+    ui.message.textContent = `Недостаточно мест. Свободно: ${remainingSeats}.`
+    return
+  }
 
   const booking: Booking = {
     id: crypto.randomUUID(),
