@@ -8,19 +8,21 @@ import { countSeats } from './lib/count-seats'
 
 const bookings: Array<Booking> = [...initialBookings]
 
+type Result<T> = { ok: true; value: T } | { ok: false; error: string }
+
 // Проверка из практики уже работает. В базе менять её не требуется.
-function readSeats(raw: FormDataEntryValue | null): number | null {
-  if (typeof raw !== 'string' || raw.trim() === '') return null
+function readSeats(raw: FormDataEntryValue | null): Result<number> {
+  if (typeof raw !== 'string' || raw.trim() === '') return { ok: false, error: 'Введите число участников.' }
   const seats = Number(raw)
-  if (!Number.isInteger(seats) || seats < 1 || seats > 5) return null
-  return seats
+  if (!Number.isInteger(seats) || seats < 1 || seats > 5) return { ok: false, error: 'Введите целое число участников от 1 до 5.' }
+  return { ok: true, value: seats }
 }
 
 // HW-А2: замените заглушку; нужный результат WorkshopId | null.
 // Для проверки через форму сначала включите список ui.workshop в месте HW-А4.
-function readWorkshop(raw: FormDataEntryValue | null): WorkshopId | null {
-  if (raw === 'typescript' || raw === 'build') return raw
-  return null
+function readWorkshop(raw: FormDataEntryValue | null): Result<WorkshopId> {
+  if (raw === 'typescript' || raw === 'build') return { ok: true, value: raw }
+  return { ok: false, error: 'Выберите занятие из списка.' }
 }
 
 const app = document.querySelector<HTMLDivElement>('#app')
@@ -143,15 +145,15 @@ ui.form.addEventListener('submit', (event) => {
   }
 
   const seats = readSeats(data.get('seats'))
-  if (seats === null) {
-    ui.message.textContent = 'Введите целое число участников от 1 до 5.'
+  if (!seats.ok) {
+    ui.message.textContent = seats.error
     return
   }
 
   // HW-А2: прочитайте data.get('workshop') через readWorkshop, обработайте отказ.
   const workshop = readWorkshop(data.get('workshop'))
-  if (workshop === null) {
-    ui.message.textContent = 'Выберите занятие из списка.'
+  if (!workshop.ok) {
+    ui.message.textContent = workshop.error
     return
   }
 
@@ -160,8 +162,8 @@ ui.form.addEventListener('submit', (event) => {
   const booking: Booking = {
     id: crypto.randomUUID(),
     name: rawName.trim(),
-    seats,
-    workshop,
+    seats: seats.value,
+    workshop: workshop.value,
     status: 'new',
     source: 'web',
     // HW-А1: добавьте проверенное занятие.
