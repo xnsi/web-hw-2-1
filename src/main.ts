@@ -1,5 +1,5 @@
 import './style.css'
-import type { Booking } from './models/booking'
+import type { Booking, WorkshopId } from './models/booking'
 import { initialBookings } from './data/initial-bookings'
 import { TYPESCRIPT_CAPACITY, BUILD_CAPACITY } from './data/capacities'
 import { countSeats } from './lib/count-seats'
@@ -18,8 +18,8 @@ function readSeats(raw: FormDataEntryValue | null): number | null {
 
 // HW-А2: замените заглушку; нужный результат WorkshopId | null.
 // Для проверки через форму сначала включите список ui.workshop в месте HW-А4.
-function readWorkshop(raw: FormDataEntryValue | null): null {
-  void raw
+function readWorkshop(raw: FormDataEntryValue | null): WorkshopId | null {
+  if (raw === 'typescript' || raw === 'build') return raw
   return null
 }
 
@@ -114,6 +114,7 @@ const ui = { form, list, total, message, workshop, typescriptFree, buildFree, lo
 
 // HW-А4: сделайте список ui.workshop доступным для выбора уже при проверке А2.
 // Здесь же скройте или удалите найденный ui.notice после проверки DOM выше.
+ui.workshop.disabled = false
 // HW-Б2: задайте ui.logo.src, alt и покажите изображение.
 
 function render(items: Booking[]) {
@@ -148,12 +149,19 @@ ui.form.addEventListener('submit', (event) => {
   }
 
   // HW-А2: прочитайте data.get('workshop') через readWorkshop, обработайте отказ.
+  const workshop = readWorkshop(data.get('workshop'))
+  if (workshop === null) {
+    ui.message.textContent = 'Выберите занятие из списка.'
+    return
+  }
+
   // HW-А3: сравните число участников с остатком мест выбранного занятия до изменения bookings.
 
   const booking: Booking = {
     id: crypto.randomUUID(),
     name: rawName.trim(),
     seats,
+    workshop,
     status: 'new',
     source: 'web',
     // HW-А1: добавьте проверенное занятие.
