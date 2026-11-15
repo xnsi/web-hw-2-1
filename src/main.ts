@@ -6,6 +6,7 @@ import { countSeats } from './lib/count-seats'
 // HW-Б1: подключите расчёты из ./lib/availability.
 import { getRemainingSeats } from './lib/availability'
 // HW-Б2: импортируйте ./assets/workshops.svg как URL.
+import workshopsUrl from './assets/workshops.svg'
 
 const bookings: Array<Booking> = [...initialBookings]
 
@@ -120,6 +121,8 @@ const ui = { form, list, total, message, workshop, typescriptFree, buildFree, lo
 ui.workshop.disabled = false
 ui.notice.hidden = true
 // HW-Б2: задайте ui.logo.src, alt и покажите изображение.
+ui.logo.src = workshopsUrl
+ui.logo.hidden = false
 
 function render(items: Booking[]) {
   ui.list.replaceChildren()
