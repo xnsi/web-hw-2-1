@@ -118,6 +118,7 @@ const ui = { form, list, total, message, workshop, typescriptFree, buildFree, lo
 // HW-А4: сделайте список ui.workshop доступным для выбора уже при проверке А2.
 // Здесь же скройте или удалите найденный ui.notice после проверки DOM выше.
 ui.workshop.disabled = false
+ui.notice.hidden = true
 // HW-Б2: задайте ui.logo.src, alt и покажите изображение.
 
 function render(items: Booking[]) {
@@ -128,7 +129,7 @@ function render(items: Booking[]) {
     const details = document.createElement('span')
     title.textContent = booking.name
     // HW-А4: добавьте название занятия в подробности карточки.
-    details.textContent = `${booking.seats} участн. · ${booking.status === 'confirmed' ? 'Подтверждена' : 'Новая'} · ${booking.source}`
+    details.textContent = `${booking.workshop === 'typescript' ? 'TypeScript' : 'Сборка проекта'} · ${booking.seats} участн. · ${booking.status === 'confirmed' ? 'Подтверждена' : 'Новая'} · ${booking.source}`
     item.append(title, details)
     ui.list.append(item)
   })
